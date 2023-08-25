@@ -4,7 +4,7 @@ A Poe API bot that lets you compare output from two bots.
 
 This bot is live as [@CompareBots](https://poe.com/CompareBots).
 
-![CompareBots output](./docs/comparebots.jpeg)
+![CompareBots output](./docs/compare-bots.jpeg)
 
 ## Running
 
