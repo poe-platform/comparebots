@@ -6,12 +6,14 @@ Bot that returns interleaved results from multiple bots.
 from __future__ import annotations
 
 import asyncio
+import json
 import re
 from collections import defaultdict
+import traceback
 from typing import AsyncIterable, AsyncIterator, Sequence
 
-from fastapi_poe import PoeBot
-from fastapi_poe.client import BotMessage, MetaMessage, stream_request
+from fastapi_poe import PoeBot, run
+from fastapi_poe.client import BotMessage, MetaMessage, stream_request, BotError
 from fastapi_poe.types import ProtocolMessage, QueryRequest, SettingsRequest, SettingsResponse
 from sse_starlette.sse import ServerSentEvent
 
@@ -85,6 +87,18 @@ def preprocess_query(query: QueryRequest, bot: str) -> QueryRequest:
     return new_query
 
 
+def exception_to_message(label: str, e: Exception) -> str:
+    if isinstance(e, BotError) and isinstance(e.__cause__, BotError) and isinstance(e.__cause__.args[0], str):
+        try:
+            args = json.loads(e.__cause__.args[0])
+        except json.JSONDecodeError:
+            pass
+        else:
+            return f"**Error from {label}**: {args.get('text')}"
+    tb = ''.join(traceback.format_exception(e))
+    return f"**Error from {label}**:\n```{tb}```"
+
+
 class CompareBot(PoeBot):
     async def get_response(self, query: QueryRequest) -> AsyncIterable[ServerSentEvent]:
         bots = get_bots_to_compare(query.query)
@@ -97,7 +111,7 @@ class CompareBot(PoeBot):
             if isinstance(msg, MetaMessage):
                 continue
             elif isinstance(msg, Exception):
-                label_to_responses[label] = [f"{label} ran into an error"]
+                label_to_responses[label] = [exception_to_message(label, msg)]
             elif msg.is_suggested_reply:
                 yield self.suggested_reply_event(msg.text)
                 continue
@@ -113,3 +127,7 @@ class CompareBot(PoeBot):
 
     async def get_settings(self, setting: SettingsRequest) -> SettingsResponse:
         return SettingsResponse(server_bot_dependencies={"any": 2}, allow_attachments=True)
+
+
+if __name__ == "__main__":
+    run(CompareBot())
