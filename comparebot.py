@@ -8,13 +8,18 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from collections import defaultdict
 import traceback
+from collections import defaultdict
 from typing import AsyncIterable, AsyncIterator, Sequence
 
 from fastapi_poe import PoeBot, run
-from fastapi_poe.client import BotMessage, MetaMessage, stream_request, BotError
-from fastapi_poe.types import ProtocolMessage, QueryRequest, SettingsRequest, SettingsResponse
+from fastapi_poe.client import BotError, BotMessage, MetaMessage, stream_request
+from fastapi_poe.types import (
+    ProtocolMessage,
+    QueryRequest,
+    SettingsRequest,
+    SettingsResponse,
+)
 from sse_starlette.sse import ServerSentEvent
 
 COMPARE_REGEX = r"\s([A-Za-z_\-\d]+)\s+vs\.?\s+([A-Za-z_\-\d]+)\s*$"
@@ -88,14 +93,18 @@ def preprocess_query(query: QueryRequest, bot: str) -> QueryRequest:
 
 
 def exception_to_message(label: str, e: Exception) -> str:
-    if isinstance(e, BotError) and isinstance(e.__cause__, BotError) and isinstance(e.__cause__.args[0], str):
+    if (
+        isinstance(e, BotError)
+        and isinstance(e.__cause__, BotError)
+        and isinstance(e.__cause__.args[0], str)
+    ):
         try:
             args = json.loads(e.__cause__.args[0])
         except json.JSONDecodeError:
             pass
         else:
             return f"**Error from {label}**: {args.get('text')}"
-    tb = ''.join(traceback.format_exception(e))
+    tb = "".join(traceback.format_exception(e))
     return f"**Error from {label}**:\n```{tb}```"
 
 
@@ -126,7 +135,9 @@ class CompareBot(PoeBot):
             yield self.replace_response_event(text)
 
     async def get_settings(self, setting: SettingsRequest) -> SettingsResponse:
-        return SettingsResponse(server_bot_dependencies={"any": 2}, allow_attachments=True)
+        return SettingsResponse(
+            server_bot_dependencies={"any": 2}, allow_attachments=True
+        )
 
 
 if __name__ == "__main__":
