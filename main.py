@@ -9,7 +9,7 @@ image = Image.debian_slim().pip_install_from_requirements("requirements.txt")
 stub = Stub("comparebots")
 
 
-@stub.function(image=image, secret=Secret.from_name("compare-bots-api-key"))
+@stub.function(image=image, secret=Secret.from_name("compare-bots-secret"))
 @asgi_app()
 def fastapi_app():
-    return make_app(CompareBot(), api_key=os.environ["POE_API_KEY"])
+    return make_app(CompareBot(), access_key=os.environ["POE_ACCESS_KEY"])
