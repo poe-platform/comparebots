@@ -8,7 +8,7 @@ This bot is live as [@CompareBots](https://poe.com/CompareBots).
 
 ## Running
 
-- Refer to [the tutorial repo](https://github.com/poe-platform/api-bot-tutorial) for
+- Refer to [the tutorial repo](https://github.com/poe-platform/server-bot-tutorial) for
   general instructions on how to use Modal and make API bots.
 - In Modal, create a secret named `compare-bots-api-key` containing a key `POE_API_KEY`
   with your API key.
