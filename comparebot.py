@@ -136,7 +136,13 @@ class CompareBot(PoeBot):
 
     async def get_settings(self, setting: SettingsRequest) -> SettingsResponse:
         return SettingsResponse(
-            server_bot_dependencies={"any": 2}, allow_attachments=True
+            server_bot_dependencies={"any": 2},
+            allow_attachments=True,
+            introduction_message=(
+                "Hi! I am a bot that allows you to compare responses from two other bots. Please "
+                'provide me your query followed by a string that looks like "bot1 vs bot2" '
+                "in order to see and compare responses from the two bots."
+            ),
         )
 
 
