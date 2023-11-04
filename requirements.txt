@@ -1,2 +1,2 @@
-fastapi-poe==0.0.18
+fastapi-poe==0.0.23
 pydantic>2
